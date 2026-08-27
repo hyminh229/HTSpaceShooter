@@ -1,16 +1,27 @@
+using System;
 using UnityEngine;
 
 public class PlayerShooting : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private float fireRate = 0.5f;
+
+    private float nextFireTime;
+
+    private void Update()
     {
-        
+        if (Input.GetMouseButton(0) && Time.time >= nextFireTime)
+        {
+            Shoot();
+            nextFireTime = Time.time + fireRate;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Shoot()
     {
-        
+
+        Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+
     }
 }
