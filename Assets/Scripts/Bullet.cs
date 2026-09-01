@@ -1,32 +1,33 @@
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class Bullet : MonoBehaviour, IDestroyable
 {
     [SerializeField] private float speed = 10f;
     [SerializeField] private int damage = 1;
 
     private void Update()
     {
+        Move();
+    }
+
+    private void Move()
+    {
         transform.Translate(Vector2.up * speed * Time.deltaTime);
     }
 
-    private void Awake()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision2D)
-    {
-        if (collision2D.gameObject.TryGetComponent(out BulletDestroyZone bulletDestroyZone))
+        if (collision.TryGetComponent(out IDamageable damageable))
         {
-            Destroy(gameObject);
-        }
+            damageable.TakeDamage(damage);
+            DestroyObject();
 
-        if (collision2D.gameObject.TryGetComponent(out EnemyHealth enemyHealth))
-        {
-            enemyHealth.TakeDamage(damage);
-            Destroy(gameObject);
-            Debug.Log("Bullet hit enemy and dealt " + damage + " damage.");
+            Debug.Log("Bullet hit damageable and dealt " + damage + " damage.");
         }
     }
 
+    public void DestroyObject()
+    {
+        Destroy(gameObject);
+    }
 }

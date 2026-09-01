@@ -1,8 +1,9 @@
 using UnityEngine;
 
-public class EnemyHealth : MonoBehaviour
+public class EnemyHealth : MonoBehaviour, IDamageable
 {
     [SerializeField] private int maxHealth = 3;
+
     private int currentHealth;
 
     private void Awake()
@@ -13,9 +14,18 @@ public class EnemyHealth : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
+
         if (currentHealth <= 0)
         {
-            Destroy(gameObject);
+            DestroyEnemy();
+        }
+    }
+
+    private void DestroyEnemy()
+    {
+        if (TryGetComponent(out IDestroyable destroyable))
+        {
+            destroyable.DestroyObject();
         }
     }
 }

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8171256140027996919}
   - component: {fileID: 481548144545695577}
   - component: {fileID: -605077430912469562}
+  - component: {fileID: -5659734900304379084}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -111,6 +112,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
   maxHealth: 3
+--- !u!114 &-5659734900304379084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727100261008302460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b691f87f9644194d84c97292a87fca8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  moveSpeed: 4
 --- !u!1 &1361227195739535949
 GameObject:
   m_ObjectHideFlags: 0
