@@ -8,9 +8,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -5659734900304379084, guid: 12470980cb568144c96bdc2bbe7ed770, type: 3}
+      propertyPath: shouldStop
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 727100261008302460, guid: 12470980cb568144c96bdc2bbe7ed770, type: 3}
       propertyPath: m_Name
-      value: Enemy
+      value: Enemy_Normal
       objectReference: {fileID: 0}
     - target: {fileID: 3674558596348048521, guid: 12470980cb568144c96bdc2bbe7ed770, type: 3}
       propertyPath: m_LocalPosition.x
