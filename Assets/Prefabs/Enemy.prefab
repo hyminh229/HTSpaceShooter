@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 481548144545695577}
   - component: {fileID: -605077430912469562}
   - component: {fileID: -5659734900304379084}
+  - component: {fileID: 6263151991279294211}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -125,6 +126,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   moveSpeed: 4
+  shouldStop: 0
+  stopY: -3
+--- !u!114 &6263151991279294211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727100261008302460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5646a445f265a9d4db8cabe5934743d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyPolarity
+  startingColor: 1
+  spriteRenderer: {fileID: 526727692219950909}
+  blueColor: {r: 0, g: 0, b: 1, a: 1}
+  redColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &1361227195739535949
 GameObject:
   m_ObjectHideFlags: 0

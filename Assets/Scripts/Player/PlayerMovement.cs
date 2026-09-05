@@ -1,30 +1,32 @@
 using UnityEngine;
 
-public class SpaceShooter : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float smoothSpeed = 15f;
     [SerializeField] private float padding = 0.5f;
+    [SerializeField] private PlayerHealth playerHealth;
 
     private Camera mainCamera;
     private Vector2 minBounds;
     private Vector2 maxBounds;
 
     private void Start()
-    {        
+    {
+
         mainCamera = Camera.main;
         CalculateScreenBounds();
     }
 
     private void Awake()
     {
+
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
     }
 
     private void Update()
-    {
-       
-        MoveWithMouse();
+    {   if(!playerHealth.IsAlive) {return;}
+        MoveWithMouse();        
     }
 
     private void MoveWithMouse()

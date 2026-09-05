@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class PlayerColorController : MonoBehaviour
+public class EnemyPolarity : MonoBehaviour
 {
-    [SerializeField] private ElementColor startingColor = ElementColor.BLUE;
+    [SerializeField] private ElementColor startingColor = ElementColor.RED;
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Color blueColor = Color.blue;
     [SerializeField] private Color redColor = Color.red;
@@ -17,36 +17,27 @@ public class PlayerColorController : MonoBehaviour
         }
 
         CurrentColor = startingColor;
+
         UpdateVisual();
     }
 
-    private void Update()
+    public void SetColor(ElementColor newColor)
     {
-        HandleColorSwitch();
-    }
+        CurrentColor = newColor;
 
-    private void HandleColorSwitch()
-    {
-        if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Space))
-        {
-            SwitchColor();
-        }
+        UpdateVisual();
     }
 
     public void SwitchColor()
     {
         if (CurrentColor == ElementColor.BLUE)
         {
-            CurrentColor = ElementColor.RED;
+            SetColor(ElementColor.RED);
         }
         else
         {
-            CurrentColor = ElementColor.BLUE;
+            SetColor(ElementColor.BLUE);
         }
-
-        UpdateVisual();
-
-        Debug.Log("Player switched color to: " + CurrentColor);
     }
 
     private void UpdateVisual()

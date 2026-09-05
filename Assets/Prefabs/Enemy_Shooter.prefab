@@ -40,6 +40,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -5659734900304379084, guid: 12470980cb568144c96bdc2bbe7ed770, type: 3}
+      propertyPath: stopY
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -5659734900304379084, guid: 12470980cb568144c96bdc2bbe7ed770, type: 3}
       propertyPath: shouldStop
       value: 1
       objectReference: {fileID: 0}
@@ -123,3 +127,4 @@ MonoBehaviour:
   bulletPrefab: {fileID: 3739410482566353081, guid: f752c85b97bb57747a3aa65aa8f12927, type: 3}
   firePoint: {fileID: 7759285413647209036}
   fireRate: 1.5
+  aimRotationOffset: -90
