@@ -10,6 +10,7 @@ public abstract class ChromaPolarityBase : MonoBehaviour
     [SerializeField] protected Color redColor = Color.red;
 
     public ElementColor CurrentColor { get; protected set; }
+    public float LastSwitchTime { get; protected set; } = -Mathf.Infinity;
 
     protected virtual void Awake()
     {
@@ -25,6 +26,7 @@ public abstract class ChromaPolarityBase : MonoBehaviour
     public virtual void SetColor(ElementColor newColor)
     {
         CurrentColor = newColor;
+        LastSwitchTime = Time.time;
         UpdateVisual();
     }
 

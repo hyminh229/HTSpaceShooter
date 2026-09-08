@@ -3,6 +3,8 @@ using UnityEngine;
 public class EnemyBullet : ProjectileBase
 {
     [SerializeField] private int absorbEnergy = 10;
+    [SerializeField] private int perfectAbsorbEnergy = 15;
+    [SerializeField] private float perfectParryWindow = 0.3f;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -11,7 +13,7 @@ public class EnemyBullet : ProjectileBase
 
         if (ColorType == playerColor.CurrentColor)
         {
-            Absorb(playerHealth);
+            Absorb(playerHealth, playerColor);
         }
         else
         {
@@ -21,7 +23,7 @@ public class EnemyBullet : ProjectileBase
         DestroyObject();
     }
 
-    private void Absorb(PlayerHealth playerHealth)
+    private void Absorb(PlayerHealth playerHealth, PlayerColorController playerColor)
     {
         if (!playerHealth.TryGetComponent(out PlayerEnergy playerEnergy))
         {
@@ -29,8 +31,14 @@ public class EnemyBullet : ProjectileBase
             return;
         }
 
-        playerEnergy.AddEnergy(absorbEnergy);
-        Debug.Log("Enemy bullet absorbed! +" + absorbEnergy + " Energy.");
+        bool isPerfect = (Time.time - playerColor.LastSwitchTime) <= perfectParryWindow;
+        int energyGained = isPerfect ? perfectAbsorbEnergy : absorbEnergy;
+
+        playerEnergy.AddEnergy(ColorType, energyGained);
+
+        Debug.Log(isPerfect
+            ? "Perfect Absorb! +" + energyGained + " " + ColorType + " Energy."
+            : "Enemy bullet absorbed! +" + energyGained + " " + ColorType + " Energy.");
     }
 
     private void DamagePlayer(PlayerHealth playerHealth)
