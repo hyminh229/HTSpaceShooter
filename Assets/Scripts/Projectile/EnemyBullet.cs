@@ -15,6 +15,10 @@ public class EnemyBullet : ProjectileBase
         {
             Absorb(playerHealth, playerColor);
         }
+        else if (collision.TryGetComponent(out PlayerShield shield) && shield.TryBlockHit())
+        {
+            // Khiên đã chặn cú va chạm sai màu này, không trừ máu.
+        }
         else
         {
             DamagePlayer(playerHealth);

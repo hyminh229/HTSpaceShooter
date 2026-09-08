@@ -7,6 +7,11 @@ public class PlayerShooting : MonoBehaviour
     [SerializeField] private Transform firePoint;
     [SerializeField] private float fireRate = 0.2f;
 
+    [Header("Bullet Upgrade")]
+    [SerializeField] private int shotLevel = 1;
+    [SerializeField] private int maxShotLevel = 3;
+    [SerializeField] private float multiShotSpreadAngle = 15f;
+
     [Header("Mega Beam")]
     [SerializeField] private GameObject megaBeamPrefab;
     [SerializeField] private float megaBeamSpawnOffset = 1.5f; // = nửa chiều dài beam, chỉnh trong Inspector
@@ -62,7 +67,26 @@ public class PlayerShooting : MonoBehaviour
             return;
         }
 
-        GameObject bulletObject = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        int bulletCount = GetBulletCountForLevel();
+        float startAngle = -(bulletCount - 1) / 2f * multiShotSpreadAngle;
+
+        for (int i = 0; i < bulletCount; i++)
+        {
+            float angleOffset = startAngle + i * multiShotSpreadAngle;
+            SpawnBullet(angleOffset);
+        }
+    }
+
+    private int GetBulletCountForLevel()
+    {
+        // level 1 = 1 viên, level 2 = 3 viên, level 3 = 5 viên...
+        return (shotLevel - 1) * 2 + 1;
+    }
+
+    private void SpawnBullet(float angleOffset)
+    {
+        Quaternion rotation = firePoint.rotation * Quaternion.Euler(0f, 0f, angleOffset);
+        GameObject bulletObject = Instantiate(bulletPrefab, firePoint.position, rotation);
 
         if (!bulletObject.TryGetComponent(out Bullet bullet))
         {
@@ -74,6 +98,18 @@ public class PlayerShooting : MonoBehaviour
         {
             bullet.SetColor(colorController.CurrentColor);
         }
+    }
+
+    public void UpgradeShot()
+    {
+        if (shotLevel >= maxShotLevel)
+        {
+            Debug.Log("Bullet already at max level.");
+            return;
+        }
+
+        shotLevel++;
+        Debug.Log("Bullet upgraded! Level: " + shotLevel);
     }
 
     private void ShootMegaBeam()
@@ -96,7 +132,6 @@ public class PlayerShooting : MonoBehaviour
             return;
         }
 
-        // Bắn ra từ firePoint theo hướng lên trên, lùi ra khỏi player để không đè lên tàu.
         Vector3 spawnPos = firePoint.position + firePoint.up * megaBeamSpawnOffset;
         GameObject beamObject = Instantiate(megaBeamPrefab, spawnPos, firePoint.rotation);
 
@@ -109,7 +144,6 @@ public class PlayerShooting : MonoBehaviour
         Debug.Log("MEGA BEAM FIRED!");
     }
 
-    // Được MegaBeam gọi lại khi nó tự huỷ, để mở khoá di chuyển/bắn thường.
     public void EndChanneling()
     {
         isChanneling = false;
