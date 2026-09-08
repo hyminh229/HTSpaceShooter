@@ -5,28 +5,35 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float smoothSpeed = 15f;
     [SerializeField] private float padding = 0.5f;
     [SerializeField] private PlayerHealth playerHealth;
+    [SerializeField] private PlayerShooting playerShooting;
 
     private Camera mainCamera;
     private Vector2 minBounds;
     private Vector2 maxBounds;
 
+    private void Awake()
+    {
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
+
+        if (playerShooting == null)
+        {
+            playerShooting = GetComponent<PlayerShooting>();
+        }
+    }
+
     private void Start()
     {
-
         mainCamera = Camera.main;
         CalculateScreenBounds();
     }
 
-    private void Awake()
-    {
-
-        Cursor.lockState = CursorLockMode.Confined;
-        Cursor.visible = false;
-    }
-
     private void Update()
-    {   if(!playerHealth.IsAlive) {return;}
-        MoveWithMouse();        
+    {
+        if (!playerHealth.IsAlive) return;
+        if (playerShooting != null && playerShooting.IsChanneling) return;
+
+        MoveWithMouse();
     }
 
     private void MoveWithMouse()

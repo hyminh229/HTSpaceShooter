@@ -15,6 +15,9 @@ public class PlayerShooting : MonoBehaviour
     private PlayerEnergy playerEnergy;
 
     private float timer;
+    private bool isChanneling;
+
+    public bool IsChanneling => isChanneling;
 
     private void Awake()
     {
@@ -30,6 +33,8 @@ public class PlayerShooting : MonoBehaviour
 
     private void HandleShooting()
     {
+        if (isChanneling) return;
+
         timer += Time.deltaTime;
 
         if (Input.GetMouseButton(0) && timer >= fireRate)
@@ -41,6 +46,8 @@ public class PlayerShooting : MonoBehaviour
 
     private void HandleMegaBeam()
     {
+        if (isChanneling) return;
+
         if (Input.GetKeyDown(KeyCode.E))
         {
             ShootMegaBeam();
@@ -89,12 +96,22 @@ public class PlayerShooting : MonoBehaviour
             return;
         }
 
-        // Bắn ra từ firePoint theo hướng lên trên (firePoint.up), lùi ra khỏi player một khoảng
-        // = nửa chiều dài beam để không đè lên tàu. Nếu đổi pivot sprite beam sang "Bottom"
-        // thì có thể bỏ offset này và Instantiate thẳng tại firePoint.position.
+        // Bắn ra từ firePoint theo hướng lên trên, lùi ra khỏi player để không đè lên tàu.
         Vector3 spawnPos = firePoint.position + firePoint.up * megaBeamSpawnOffset;
-        Instantiate(megaBeamPrefab, spawnPos, firePoint.rotation);
+        GameObject beamObject = Instantiate(megaBeamPrefab, spawnPos, firePoint.rotation);
 
+        if (beamObject.TryGetComponent(out MegaBeam beam))
+        {
+            beam.Init(this);
+        }
+
+        isChanneling = true;
         Debug.Log("MEGA BEAM FIRED!");
+    }
+
+    // Được MegaBeam gọi lại khi nó tự huỷ, để mở khoá di chuyển/bắn thường.
+    public void EndChanneling()
+    {
+        isChanneling = false;
     }
 }

@@ -5,6 +5,13 @@ public class MegaBeam : MonoBehaviour, IDestroyable
     [SerializeField] private float beamDuration = 1f;
     [SerializeField] private int damage = 10;
 
+    private PlayerShooting owner;
+
+    public void Init(PlayerShooting shootingOwner)
+    {
+        owner = shootingOwner;
+    }
+
     private void Start()
     {
         Invoke(nameof(DestroyObject), beamDuration);
@@ -20,6 +27,7 @@ public class MegaBeam : MonoBehaviour, IDestroyable
 
     public void DestroyObject()
     {
+        owner?.EndChanneling();
         Destroy(gameObject);
     }
 }
