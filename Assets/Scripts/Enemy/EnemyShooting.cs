@@ -6,9 +6,9 @@ public class EnemyShooting : MonoBehaviour
     [SerializeField] private Transform firePoint;
     [SerializeField] private float fireRate = 1.5f;
     [SerializeField] private float aimRotationOffset = -90f;
+    [SerializeField] private ElementColor bulletColor = ElementColor.BLUE;
 
     private EnemyController enemyController;
-    private EnemyPolarity enemyPolarity;
     private Transform player;
 
     private float timer;
@@ -16,7 +16,6 @@ public class EnemyShooting : MonoBehaviour
     private void Awake()
     {
         enemyController = GetComponent<EnemyController>();
-        enemyPolarity = GetComponent<EnemyPolarity>();
     }
 
     private void Start()
@@ -77,22 +76,13 @@ public class EnemyShooting : MonoBehaviour
         GameObject bulletObject =
             Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
 
-
-        EnemyBullet enemyBullet =
-            bulletObject.GetComponent<EnemyBullet>();
-
-        if (enemyBullet == null)
+        if (!bulletObject.TryGetComponent(out EnemyBullet enemyBullet))
         {
             Debug.LogError("Enemy bullet prefab does not contain EnemyBullet.");
             return;
         }
 
-        if (enemyPolarity != null)
-        {
-            enemyBullet.SetColor(
-                enemyPolarity.CurrentColor
-            );
-        }
+        enemyBullet.SetColor(bulletColor);
     }
 
     private void AimAtPlayer()

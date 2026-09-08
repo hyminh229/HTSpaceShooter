@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour, IDamageable
@@ -5,6 +6,8 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     [SerializeField] private int maxHealth = 5;
     private int currentHealth;
     public bool IsAlive { get; private set; }
+
+    public event Action OnDeath;
 
     private void Awake()
     {
@@ -41,6 +44,8 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         Debug.Log(
             gameObject.name + " destroyed."
         );
+
+        OnDeath?.Invoke();
 
         Destroy(gameObject);
     }
