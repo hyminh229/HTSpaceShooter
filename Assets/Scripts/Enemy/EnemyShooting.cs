@@ -20,8 +20,7 @@ public class EnemyShooting : MonoBehaviour
 
     private void Start()
     {
-        GameObject playerObject =
-            GameObject.FindGameObjectWithTag("Player");
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
 
         if (playerObject != null)
         {
@@ -38,27 +37,15 @@ public class EnemyShooting : MonoBehaviour
 
     private void Update()
     {
-        if (enemyController == null)
-        {
-            return;
-        }
-
-        if (!enemyController.HasStopped)
-        {
-            return;
-        }
-
-        if (player == null)
-        {
-            return;
-        }
+        if (enemyController == null) return;
+        if (!enemyController.HasStopped) return;
+        if (player == null) return;
 
         timer += Time.deltaTime;
 
         if (timer >= fireRate)
         {
             Shoot();
-
             timer = 0f;
         }
     }
@@ -73,8 +60,11 @@ public class EnemyShooting : MonoBehaviour
 
         AimAtPlayer();
 
-        GameObject bulletObject =
-            Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        GameObject bulletObject = ObjectPooler.Instance != null
+            ? ObjectPooler.Instance.Spawn(bulletPrefab, firePoint.position, firePoint.rotation)
+            : Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+
+        if (bulletObject == null) return;
 
         if (!bulletObject.TryGetComponent(out EnemyBullet enemyBullet))
         {
