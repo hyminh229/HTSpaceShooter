@@ -14,7 +14,7 @@ public class PlayerShooting : MonoBehaviour
 
     [Header("Mega Beam")]
     [SerializeField] private GameObject megaBeamPrefab;
-    [SerializeField] private float megaBeamSpawnOffset = 1.5f; // = nửa chiều dài beam, chỉnh trong Inspector
+    [SerializeField] private float megaBeamSpawnOffset = 1.5f;
 
     private PlayerColorController colorController;
     private PlayerEnergy playerEnergy;
@@ -79,14 +79,18 @@ public class PlayerShooting : MonoBehaviour
 
     private int GetBulletCountForLevel()
     {
-        // level 1 = 1 viên, level 2 = 3 viên, level 3 = 5 viên...
         return (shotLevel - 1) * 2 + 1;
     }
 
     private void SpawnBullet(float angleOffset)
     {
         Quaternion rotation = firePoint.rotation * Quaternion.Euler(0f, 0f, angleOffset);
-        GameObject bulletObject = Instantiate(bulletPrefab, firePoint.position, rotation);
+
+        GameObject bulletObject = ObjectPooler.Instance != null
+            ? ObjectPooler.Instance.Spawn(bulletPrefab, firePoint.position, rotation)
+            : Instantiate(bulletPrefab, firePoint.position, rotation);
+
+        if (bulletObject == null) return;
 
         if (!bulletObject.TryGetComponent(out Bullet bullet))
         {

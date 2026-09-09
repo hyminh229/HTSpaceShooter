@@ -50,6 +50,13 @@ public abstract class ProjectileBase : MonoBehaviour, IDestroyable
 
     public virtual void DestroyObject()
     {
-        Destroy(gameObject);
+        if (ObjectPooler.Instance != null)
+        {
+            ObjectPooler.Instance.Despawn(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }
