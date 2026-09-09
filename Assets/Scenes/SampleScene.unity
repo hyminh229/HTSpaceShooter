@@ -646,10 +646,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94fa97fb93cbc7a48a0e49ea418cc31b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  spawnPoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  topBoundary: {fileID: 101339119}
+  edgeMargin: 1.5
+  spawnYMargin: 1.5
 --- !u!4 &685090842
 Transform:
   m_ObjectHideFlags: 0
@@ -1115,7 +1114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a4581f1f4bb95b4fb1f929efd4ff6d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DestroyZone
---- !u!1 &1259942190
+--- !u!1 &1212015748
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1123,41 +1122,58 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1259942192}
-  - component: {fileID: 1259942191}
+  - component: {fileID: 1212015750}
+  - component: {fileID: 1212015749}
   m_Layer: 0
-  m_Name: WaveManager
+  m_Name: EnemyDirector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1259942191
+--- !u!114 &1212015749
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1259942190}
+  m_GameObject: {fileID: 1212015748}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81eaf37220b174740ba1a30a38111979, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WaveManager
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDirector
   enemySpawner: {fileID: 685090841}
-  waves:
-  - enemyPrefab: {fileID: 8078699811275572655, guid: d5fb47a190426c340823f8650ceb9c23, type: 3}
-    count: 3
-  delayBetweenWaves: 2
+  tiers:
+  - tierName: Wave_1
+    enemyPrefabs:
+    - {fileID: 3704000933507998696, guid: f179bfb3e131f1e4dad6eca00ca2c368, type: 3}
+    unlockTime: 0
+  - tierName: Wave_2
+    enemyPrefabs:
+    - {fileID: 791762027352553314, guid: 79cc56d7ece26a74ea17a94a9fe248fd, type: 3}
+    - {fileID: 3704000933507998696, guid: f179bfb3e131f1e4dad6eca00ca2c368, type: 3}
+    unlockTime: 20
+  - tierName: 
+    enemyPrefabs:
+    - {fileID: 8078699811275572655, guid: d5fb47a190426c340823f8650ceb9c23, type: 3}
+    - {fileID: 3704000933507998696, guid: f179bfb3e131f1e4dad6eca00ca2c368, type: 3}
+    - {fileID: 791762027352553314, guid: 79cc56d7ece26a74ea17a94a9fe248fd, type: 3}
+    unlockTime: 45
+  initialSpawnInterval: 2.5
+  minSpawnInterval: 0.8
+  spawnIntervalDecreasePerMinute: 0.3
   minColorClusterSize: 2
   maxColorClusterSize: 4
---- !u!4 &1259942192
+  powerUpPrefabs: []
+  powerUpDropChancePerKill: 0.05
+--- !u!4 &1212015750
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1259942190}
+  m_GameObject: {fileID: 1212015748}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -1612,5 +1628,5 @@ SceneRoots:
   - {fileID: 619394802}
   - {fileID: 811968756}
   - {fileID: 514652460}
-  - {fileID: 1259942192}
   - {fileID: 685090842}
+  - {fileID: 1212015750}
