@@ -16,26 +16,38 @@ public enum WaveFormation
 [Serializable]
 public class WaveDefinition
 {
+    public enum BulletColorMode
+    {
+        SameAsBody,      // Đạn cùng màu thân — dễ đọc, dùng cho wave sớm
+        OppositeOfBody,  // Đạn luôn khác màu thân — bắt buộc nhìn đạn, không nhìn thân
+        IndependentRandom
+    }
+
     public string waveName = "Wave";
     public WaveFormation formation = WaveFormation.Grid;
     public GameObject enemyPrefab;
 
-    [Header("Color")]
+    [Header("Color (thân)")]
     public bool useRandomColor = true;
-    public ElementColor color = ElementColor.BLUE; // dùng khi useRandomColor = false
+    public ElementColor color = ElementColor.BLUE;
 
-    [Header("Movement Override (áp dụng qua EnemyController.ConfigureMovement)")]
+    [Header("Bullet Color (chỉ áp dụng nếu enemy có EnemyShooting)")]
+    public BulletColorMode bulletColorMode = BulletColorMode.SameAsBody;
+
+    [Header("Movement Override")]
     public MovementPattern movementPattern = MovementPattern.LinearDown;
     public float moveSpeed = 4f;
 
     [Header("Shooting")]
-    [Range(0f, 1f)] public float shooterChance = 0f; // % số quái trong wave này được phép bắn
+    [Range(0f, 1f)] public float shooterChance = 0f;
 
     [Header("Grid")]
     public int rows = 5;
     public int columns = 8;
     public float gridSpacingX = 1.5f;
     public float gridSpacingY = 1.2f;
+    [Tooltip("Vị trí Y của hàng TRÊN CÙNG sau khi đã vào đội hình — phải nằm trong tầm nhìn camera (VD ~3.5), KHÔNG phải vùng spawn ngoài màn hình.")]
+    public float formationTopY = 3.5f;
 
     [Header("Diagonal Shower")]
     public int showerCount = 20;
@@ -46,6 +58,9 @@ public class WaveDefinition
     public int maxCount = 25;
     public float growInterval = 3f;
 
+    [Header("Zigzag Lines")]
+    public int zigzagLineCount = 6;
+
     [Header("Entry Effect (khuyến nghị chỉ bật cho Grid)")]
     public bool useEntryEffect = false;
     public float entryDropHeight = 3f;
@@ -54,8 +69,14 @@ public class WaveDefinition
 
 public class WaveManager : MonoBehaviour
 {
+    [Header("References")]
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private List<WaveDefinition> waves = new List<WaveDefinition>();
+    [SerializeField] private float delayBetweenWaves = 2f;
+
+    [Header("Power-Up Drop (khi wave clear)")]
+    [SerializeField] private GameObject[] powerUpPrefabs;
+    [SerializeField][Range(0f, 1f)] private float powerUpDropChance = 0.6f;
 
     private int currentWaveIndex = -1;
     private int aliveCount;
@@ -76,9 +97,42 @@ public class WaveManager : MonoBehaviour
         }
 
         WaveDefinition wave = waves[currentWaveIndex];
-        Debug.Log("Bắt đầu " + wave.waveName);
 
+        if (wave.formation == WaveFormation.Boss)
+        {
+            Debug.LogWarning(wave.waveName + ": Boss chưa được cài đặt (Phase 7).");
+            StartNextWave();
+            return;
+        }
+
+        int totalCount = GetTotalEnemyCount(wave);
+
+        if (totalCount <= 0)
+        {
+            Debug.LogWarning(wave.waveName + " có tổng số địch = 0, bỏ qua wave này.");
+            StartNextWave();
+            return;
+        }
+
+        // Chốt tổng số NGAY LẬP TỨC, trước khi spawn — tránh race condition
+        // giữa lúc coroutine đang spawn dở và player giết nhanh hơn tốc độ spawn.
+        aliveCount = totalCount;
+
+        Debug.Log("Bắt đầu " + wave.waveName + " — tổng " + totalCount + " địch.");
         StartCoroutine(RunWave(wave));
+    }
+
+    private int GetTotalEnemyCount(WaveDefinition wave)
+    {
+        switch (wave.formation)
+        {
+            case WaveFormation.Grid: return wave.rows * wave.columns;
+            case WaveFormation.DiagonalShower: return wave.showerCount;
+            case WaveFormation.OrbitGrowing:
+            case WaveFormation.ApproachGrowing: return wave.maxCount;
+            case WaveFormation.ZigzagLines: return wave.zigzagLineCount * wave.columns;
+            default: return 0;
+        }
     }
 
     private IEnumerator RunWave(WaveDefinition wave)
@@ -88,23 +142,15 @@ public class WaveManager : MonoBehaviour
             case WaveFormation.Grid:
                 yield return StartCoroutine(SpawnGrid(wave));
                 break;
-
             case WaveFormation.DiagonalShower:
                 yield return StartCoroutine(SpawnDiagonalShower(wave));
                 break;
-
             case WaveFormation.OrbitGrowing:
             case WaveFormation.ApproachGrowing:
                 yield return StartCoroutine(SpawnGrowing(wave));
                 break;
-
             case WaveFormation.ZigzagLines:
                 yield return StartCoroutine(SpawnZigzagLines(wave));
-                break;
-
-            case WaveFormation.Boss:
-                Debug.LogWarning(wave.waveName + ": Boss chưa được cài đặt (Phase 7).");
-                StartNextWave();
                 break;
         }
     }
@@ -116,15 +162,12 @@ public class WaveManager : MonoBehaviour
         for (int row = 0; row < wave.rows; row++)
         {
             ElementColor rowColor = wave.useRandomColor ? GetRandomColor() : wave.color;
+            // Hàng 0 = gần player nhất (dưới đội hình); hàng cuối = formationTopY (trên đội hình).
+            float targetY = wave.formationTopY - (wave.rows - 1 - row) * wave.gridSpacingY;
 
             for (int col = 0; col < wave.columns; col++)
             {
-                Vector3 targetPos = new Vector3(
-                    startX + col * wave.gridSpacingX,
-                    enemySpawner.SpawnY + row * wave.gridSpacingY,
-                    0f
-                );
-
+                Vector3 targetPos = new Vector3(startX + col * wave.gridSpacingX, targetY, 0f);
                 SpawnEnemyInstance(wave.enemyPrefab, targetPos, rowColor, wave);
 
                 if (wave.entryStaggerDelay > 0f)
@@ -145,7 +188,6 @@ public class WaveManager : MonoBehaviour
             ElementColor spawnColor = wave.useRandomColor ? GetRandomColor() : wave.color;
 
             SpawnEnemyInstance(wave.enemyPrefab, pos, spawnColor, wave);
-
             yield return new WaitForSeconds(wave.showerSpawnInterval);
         }
     }
@@ -174,11 +216,9 @@ public class WaveManager : MonoBehaviour
 
     private IEnumerator SpawnZigzagLines(WaveDefinition wave)
     {
-        int linesSpawned = 0;
-
-        while (linesSpawned < wave.maxCount)
+        for (int line = 0; line < wave.zigzagLineCount; line++)
         {
-            bool fromLeft = linesSpawned % 2 == 0;
+            bool fromLeft = line % 2 == 0;
             float startX = fromLeft ? enemySpawner.MinX : enemySpawner.MaxX;
             ElementColor lineColor = wave.useRandomColor ? GetRandomColor() : wave.color;
 
@@ -186,14 +226,8 @@ public class WaveManager : MonoBehaviour
             {
                 Vector3 pos = new Vector3(startX, enemySpawner.SpawnY - col * wave.gridSpacingY, 0f);
                 SpawnEnemyInstance(wave.enemyPrefab, pos, lineColor, wave);
-
-                if (wave.entryStaggerDelay > 0f)
-                {
-                    yield return new WaitForSeconds(wave.entryStaggerDelay);
-                }
             }
 
-            linesSpawned++;
             yield return new WaitForSeconds(wave.growInterval);
         }
     }
@@ -201,11 +235,16 @@ public class WaveManager : MonoBehaviour
     private void SpawnEnemyInstance(GameObject prefab, Vector3 targetPosition, ElementColor color, WaveDefinition wave)
     {
         Vector3 spawnPosition = wave.useEntryEffect
-            ? targetPosition + Vector3.up * wave.entryDropHeight
+            ? new Vector3(targetPosition.x, enemySpawner.SpawnY + wave.entryDropHeight, 0f)
             : targetPosition;
 
         GameObject instance = enemySpawner.SpawnAt(prefab, spawnPosition, color);
-        if (instance == null) return;
+
+        if (instance == null)
+        {
+            aliveCount--; // spawn thất bại, không tính vào tổng nữa
+            return;
+        }
 
         if (wave.useEntryEffect && instance.TryGetComponent(out EnemyFormationEntry entry))
         {
@@ -220,9 +259,12 @@ public class WaveManager : MonoBehaviour
         if (instance.TryGetComponent(out EnemyShooting shooting))
         {
             shooting.enabled = UnityEngine.Random.value < wave.shooterChance;
-        }
 
-        aliveCount++;
+            if (shooting.enabled)
+            {
+                shooting.SetBulletColor(ResolveBulletColor(wave.bulletColorMode, color));
+            }
+        }
 
         if (instance.TryGetComponent(out EnemyHealth enemyHealth))
         {
@@ -231,6 +273,19 @@ public class WaveManager : MonoBehaviour
         else if (instance.TryGetComponent(out MeteorHealth meteorHealth))
         {
             meteorHealth.OnDeath += HandleEnemyCleared;
+        }
+    }
+
+    private ElementColor ResolveBulletColor(WaveDefinition.BulletColorMode mode, ElementColor bodyColor)
+    {
+        switch (mode)
+        {
+            case WaveDefinition.BulletColorMode.OppositeOfBody:
+                return bodyColor == ElementColor.BLUE ? ElementColor.RED : ElementColor.BLUE;
+            case WaveDefinition.BulletColorMode.IndependentRandom:
+                return GetRandomColor();
+            default:
+                return bodyColor;
         }
     }
 
@@ -245,7 +300,19 @@ public class WaveManager : MonoBehaviour
 
         if (aliveCount <= 0)
         {
-            StartNextWave();
+            TryDropPowerUp();
+            Invoke(nameof(StartNextWave), delayBetweenWaves);
         }
+    }
+
+    private void TryDropPowerUp()
+    {
+        if (powerUpPrefabs == null || powerUpPrefabs.Length == 0) return;
+        if (UnityEngine.Random.value > powerUpDropChance) return;
+
+        GameObject prefab = powerUpPrefabs[UnityEngine.Random.Range(0, powerUpPrefabs.Length)];
+        Instantiate(prefab, new Vector3(0f, 3f, 0f), Quaternion.identity);
+
+        Debug.Log("Power-up dropped after " + waves[currentWaveIndex].waveName);
     }
 }

@@ -16,21 +16,9 @@ public class EnemyShooting : MonoBehaviour
     private void Start()
     {
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject != null) player = playerObject.transform;
+        else Debug.LogWarning("EnemyShooting could not find Player. Make sure Player has the 'Player' tag.");
 
-        if (playerObject != null)
-        {
-            player = playerObject.transform;
-        }
-        else
-        {
-            Debug.LogWarning(
-                "EnemyShooting could not find Player. " +
-                "Make sure Player has the 'Player' tag."
-            );
-        }
-
-        // Lệch pha ngẫu nhiên, tránh cả đám vài chục con "roll xúc xắc"
-        // đúng cùng 1 thời điểm.
         timer = Random.Range(0f, fireCheckInterval);
     }
 
@@ -43,16 +31,14 @@ public class EnemyShooting : MonoBehaviour
         if (timer >= fireCheckInterval)
         {
             timer = 0f;
-
-            // Không bắn đều tay: mỗi mốc fireCheckInterval chỉ có fireChance
-            // cơ hội thực sự bắn. Kết hợp với EnemyShooting.enabled bị
-            // WaveManager tắt ngẫu nhiên trên nhiều con, đạn sẽ rơi thưa
-            // và bất ngờ thay vì thành bức tường đạn.
-            if (Random.value <= fireChance)
-            {
-                Shoot();
-            }
+            if (Random.value <= fireChance) Shoot();
         }
+    }
+
+    // Cho phép WaveManager gán màu đạn độc lập với màu thân theo từng wave (Phase 3.5).
+    public void SetBulletColor(ElementColor color)
+    {
+        bulletColor = color;
     }
 
     private void Shoot()
@@ -63,14 +49,8 @@ public class EnemyShooting : MonoBehaviour
             return;
         }
 
-        if (aimAtPlayer)
-        {
-            AimAtPlayer();
-        }
-        else
-        {
-            firePoint.rotation = Quaternion.Euler(0f, 0f, 180f);
-        }
+        if (aimAtPlayer) AimAtPlayer();
+        else firePoint.rotation = Quaternion.Euler(0f, 0f, 180f);
 
         GameObject bulletObject = ObjectPooler.Instance != null
             ? ObjectPooler.Instance.Spawn(bulletPrefab, firePoint.position, firePoint.rotation)
@@ -91,7 +71,6 @@ public class EnemyShooting : MonoBehaviour
     {
         Vector2 direction = player.position - firePoint.position;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        float aimAngle = angle + aimRotationOffset;
-        firePoint.rotation = Quaternion.Euler(0f, 0f, aimAngle);
+        firePoint.rotation = Quaternion.Euler(0f, 0f, angle + aimRotationOffset);
     }
 }
