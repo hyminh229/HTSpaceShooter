@@ -56,27 +56,14 @@ public class EnemyController : MonoBehaviour, IDestroyable
     {
         switch (pattern)
         {
-            case MovementPattern.LinearDown:
-                MoveLinearDown();
-                break;
-            case MovementPattern.Hover:
-                MoveHover();
-                break;
-            case MovementPattern.OrbitPoint:
-                MoveOrbit();
-                break;
-            case MovementPattern.RandomFlutter:
-                MoveRandomFlutter();
-                break;
-            case MovementPattern.SideToSideDescent:
-                MoveSideToSideDescent();
-                break;
+            case MovementPattern.LinearDown: MoveLinearDown(); break;
+            case MovementPattern.Hover: MoveHover(); break;
+            case MovementPattern.OrbitPoint: MoveOrbit(); break;
+            case MovementPattern.RandomFlutter: MoveRandomFlutter(); break;
+            case MovementPattern.SideToSideDescent: MoveSideToSideDescent(); break;
         }
     }
 
-    // WaveManager gọi ngay sau khi spawn để gán pattern + tốc độ theo từng wave,
-    // nhờ vậy 1 prefab duy nhất dùng được cho mọi vai trò "quái nhỏ" thay vì
-    // phải tách Enemy_Fast/Enemy_Normal riêng.
     public void ConfigureMovement(MovementPattern newPattern, float newSpeed)
     {
         pattern = newPattern;
@@ -149,8 +136,17 @@ public class EnemyController : MonoBehaviour, IDestroyable
         transform.position = new Vector2(descentBasePos.x + offsetX, descentBasePos.y);
     }
 
+    // Fix: mọi đường huỷ (DestroyZone, ramming) đều đi qua EnemyHealth.Kill()
+    // để OnDeath luôn fire, WaveManager đếm đúng aliveCount.
     public void DestroyObject()
     {
-        Destroy(gameObject);
+        if (TryGetComponent(out EnemyHealth enemyHealth))
+        {
+            enemyHealth.Kill();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }

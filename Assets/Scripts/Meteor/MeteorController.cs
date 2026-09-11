@@ -8,11 +8,11 @@ public class MeteorController : MonoBehaviour, IDestroyable
     [SerializeField] private float moveSpeed = 1.5f;
 
     [Header("Chroma Reaction")]
-    [SerializeField] private MeteorSize meteorSize = MeteorSize.LARGE;
+    [SerializeField] private MeteorSize meteorSize = MeteorSize.SMALL;
     [SerializeField] private int correctColorDamageMultiplier = 2;
     [SerializeField] private float bounceNudgeDistance = 0.3f;
 
-    [Header("Explosion (chỉ dùng khi meteorSize = SMALL)")]
+    [Header("Explosion (chỉ dùng khi meteorSize = LARGE)")]
     [SerializeField] private float explosionRadius = 2f;
     [SerializeField] private int explosionDamage = 2;
 
@@ -25,10 +25,7 @@ public class MeteorController : MonoBehaviour, IDestroyable
         meteorPolarity = GetComponent<MeteorPolarity>();
     }
 
-    private void Update()
-    {
-        Move();
-    }
+    private void Update() => Move();
 
     private void Move()
     {
@@ -46,7 +43,6 @@ public class MeteorController : MonoBehaviour, IDestroyable
         {
             meteorHealth.TakeDamage(bullet.Damage * correctColorDamageMultiplier);
             bullet.DestroyObject();
-
             Debug.Log("Correct color hit! Meteor takes bonus damage.");
         }
         else
@@ -57,7 +53,7 @@ public class MeteorController : MonoBehaviour, IDestroyable
 
     private void HandleWrongColorHit(Bullet bullet)
     {
-        if (meteorSize == MeteorSize.LARGE)
+        if (meteorSize == MeteorSize.SMALL)
         {
             BounceBullet(bullet);
         }
@@ -70,10 +66,8 @@ public class MeteorController : MonoBehaviour, IDestroyable
 
     private void BounceBullet(Bullet bullet)
     {
-        // Đảo hướng bay của đạn 180 độ, đẩy nhẹ ra khỏi collider để tránh trigger lại ngay lập tức.
-        bullet.transform.Rotate(0f, 0f, 90f);
+        bullet.transform.Rotate(0f, 0f, 180f);
         bullet.transform.position += bullet.transform.up * bounceNudgeDistance;
-
         Debug.Log("Meteor bounced wrong-color bullet.");
     }
 
@@ -93,8 +87,9 @@ public class MeteorController : MonoBehaviour, IDestroyable
         meteorHealth.Kill();
     }
 
+    // Fix: rơi ra khỏi DestroyZoneBottom cũng phải qua MeteorHealth.Kill() để OnDeath fire.
     public void DestroyObject()
     {
-        Destroy(gameObject);
+        meteorHealth.Kill();
     }
 }

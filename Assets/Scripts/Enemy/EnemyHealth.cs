@@ -17,33 +17,33 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
     public void TakeDamage(int damage)
     {
-        if (!IsAlive)
-        {
+        if (!IsAlive) return;
+        if (damage <= 0) return;
 
-            return;
-        }
-
-        if (damage <= 0)
-        {
-            return;
-        }
         currentHealth -= damage;
         Debug.Log(gameObject.name + " took " + damage + " damage. HP: " + currentHealth + "/" + maxHealth);
+
         if (currentHealth <= 0)
         {
             Die();
         }
     }
 
+    // Dùng khi enemy cần "chết" ngay lập tức mà không qua damage (VD: bay ra khỏi DestroyZone,
+    // bị player ramming) — vẫn phải fire OnDeath để WaveManager đếm đúng.
+    public void Kill()
+    {
+        if (!IsAlive) return;
+        currentHealth = 0;
+        Die();
+    }
+
     private void Die()
     {
         IsAlive = false;
-
         currentHealth = 0;
 
-        Debug.Log(
-            gameObject.name + " destroyed."
-        );
+        Debug.Log(gameObject.name + " destroyed.");
 
         OnDeath?.Invoke();
 
