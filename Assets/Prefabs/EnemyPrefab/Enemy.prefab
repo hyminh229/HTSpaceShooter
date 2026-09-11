@@ -14,8 +14,10 @@ GameObject:
   - component: {fileID: -605077430912469562}
   - component: {fileID: -5659734900304379084}
   - component: {fileID: 6263151991279294211}
-  - component: {fileID: 6337801135934410092}
   - component: {fileID: -4464073069281376554}
+  - component: {fileID: 6337801135934410092}
+  - component: {fileID: 5897707616289683315}
+  - component: {fileID: 8901509767455375107}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -37,6 +39,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7179304560081414452}
+  - {fileID: 462963118288058235}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &8171256140027996919
@@ -127,9 +130,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b691f87f9644194d84c97292a87fca8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  pattern: 3
   moveSpeed: 4
   shouldStop: 0
   stopY: -3
+  hoverY: 2
+  horizontalRange: 3
+  horizontalSpeed: 2
+  orbitCenter: {x: 0, y: 0}
+  orbitRadius: 3
+  orbitAngularSpeed: 60
+  flutterMin: {x: -8, y: 1}
+  flutterMax: {x: 8, y: 4}
+  flutterChangeInterval: 1.5
 --- !u!114 &6263151991279294211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,6 +159,19 @@ MonoBehaviour:
   spriteRenderer: {fileID: 526727692219950909}
   blueColor: {r: 0, g: 0, b: 1, a: 1}
   redColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!114 &-4464073069281376554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727100261008302460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c31631681b1f1b148a365a33a67931b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyEnergyDrop
+  energyOrbPrefab: {fileID: 6299849436140125768, guid: de7a06ea85ac34f4aab6a18c86e410aa, type: 3}
 --- !u!212 &6337801135934410092
 SpriteRenderer:
   serializedVersion: 2
@@ -205,7 +231,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
---- !u!114 &-4464073069281376554
+--- !u!114 &5897707616289683315
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -214,10 +240,30 @@ MonoBehaviour:
   m_GameObject: {fileID: 727100261008302460}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c31631681b1f1b148a365a33a67931b2, type: 3}
+  m_Script: {fileID: 11500000, guid: 169a5828b7d43cb4083beea6c0e69cbb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyEnergyDrop
-  energyOrbPrefab: {fileID: 6299849436140125768, guid: de7a06ea85ac34f4aab6a18c86e410aa, type: 3}
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyShooting
+  bulletPrefab: {fileID: 3739410482566353081, guid: f752c85b97bb57747a3aa65aa8f12927, type: 3}
+  firePoint: {fileID: 462963118288058235}
+  fireCheckInterval: 1.5
+  fireChance: 0.25
+  aimRotationOffset: -90
+  bulletColor: 0
+  aimAtPlayer: 0
+--- !u!114 &8901509767455375107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727100261008302460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a4142c947cff614181a3d1054002b0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyFormationEntry
+  entrySpeed: 6
+  arrivalThreshold: 0.05
 --- !u!1 &1361227195739535949
 GameObject:
   m_ObjectHideFlags: 0
@@ -309,3 +355,34 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &3827344424471875404
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 462963118288058235}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &462963118288058235
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3827344424471875404}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3674558596348048521}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
