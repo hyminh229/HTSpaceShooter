@@ -3,14 +3,18 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     [Header("Spawn Area")]
-    [SerializeField] private Collider2D topBoundary; // Kéo Collider2D của DestroyZoneTop vào đây
-    [SerializeField] private float edgeMargin = 1.5f; // Cách 2 đầu thanh 1 khoảng, tránh spawn dính DestroyZoneLeft/Right
-    [SerializeField] private float spawnYMargin = 1.5f; // Đệm phía trên mép camera, tránh chạm DestroyZoneTop khi vừa spawn
+    [SerializeField] private Collider2D topBoundary;
+    [SerializeField] private float edgeMargin = 1.5f;
+    [SerializeField] private float spawnYMargin = 1.5f;
 
     private Camera mainCamera;
     private float spawnY;
     private float minX;
     private float maxX;
+
+    public float SpawnY => spawnY;
+    public float MinX => minX;
+    public float MaxX => maxX;
 
     private void Start()
     {
@@ -37,24 +41,21 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    public EnemyController SpawnEnemy(GameObject enemyPrefab, ElementColor bodyColor)
+    public GameObject SpawnAt(GameObject prefab, Vector3 position, ElementColor color)
     {
-        if (enemyPrefab == null)
+        if (prefab == null)
         {
-            Debug.LogWarning("EnemySpawner is missing enemy prefab.");
+            Debug.LogWarning("EnemySpawner is missing prefab.");
             return null;
         }
 
-        float randomX = Random.Range(minX, maxX);
-        Vector3 spawnPosition = new Vector3(randomX, spawnY, 0f);
+        GameObject instance = Instantiate(prefab, position, Quaternion.identity);
 
-        GameObject enemyObject = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
-
-        if (enemyObject.TryGetComponent(out EnemyPolarity enemyPolarity))
+        if (instance.TryGetComponent(out ChromaPolarityBase polarity))
         {
-            enemyPolarity.SetColor(bodyColor);
+            polarity.SetColor(color);
         }
 
-        return enemyObject.GetComponent<EnemyController>();
+        return instance;
     }
 }
