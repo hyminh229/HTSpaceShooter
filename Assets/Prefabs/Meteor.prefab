@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 2493738735025872560}
   - component: {fileID: 5077816081467060614}
   - component: {fileID: 7217073541266136270}
-  - component: {fileID: 8052745831291946452}
-  - component: {fileID: 3582231415078449450}
+  - component: {fileID: 7895081776142986583}
+  - component: {fileID: 6294028867322491476}
   m_Layer: 0
   m_Name: Meteor
   m_TagString: Untagged
@@ -173,7 +173,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
---- !u!114 &8052745831291946452
+--- !u!114 &7895081776142986583
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -186,10 +186,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MeteorPolarity
   startingColor: 0
-  spriteRenderer: {fileID: 931048014912229516}
+  spriteRenderer: {fileID: 0}
   blueColor: {r: 0, g: 0, b: 1, a: 1}
   redColor: {r: 1, g: 0, b: 0, a: 1}
---- !u!114 &3582231415078449450
+--- !u!114 &6294028867322491476
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -201,7 +201,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cc18975b9ae8274983652e4e9cebba6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MeteorController
-  moveSpeed: 3
+  moveSpeed: 1.5
+  moveDirection: {x: 0, y: -1}
   meteorSize: 0
   correctColorDamageMultiplier: 2
   bounceNudgeDistance: 0.3

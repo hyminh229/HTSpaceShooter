@@ -1,78 +1,62 @@
 using UnityEngine;
 
 [RequireComponent(typeof(MeteorHealth))]
-[RequireComponent(typeof(MeteorPolarity))]
 public class MeteorController : MonoBehaviour, IDestroyable
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 1.5f;
+    [SerializeField] private Vector2 moveDirection = Vector2.down;
 
-    [Header("Chroma Reaction")]
+    [Header("Explosion khi chết (chỉ dùng khi meteorSize = LARGE)")]
     [SerializeField] private MeteorSize meteorSize = MeteorSize.SMALL;
-    [SerializeField] private int correctColorDamageMultiplier = 2;
-    [SerializeField] private float bounceNudgeDistance = 0.3f;
-
-    [Header("Explosion (chỉ dùng khi meteorSize = LARGE)")]
     [SerializeField] private float explosionRadius = 2f;
     [SerializeField] private int explosionDamage = 2;
 
     private MeteorHealth meteorHealth;
-    private MeteorPolarity meteorPolarity;
 
     private void Awake()
     {
         meteorHealth = GetComponent<MeteorHealth>();
-        meteorPolarity = GetComponent<MeteorPolarity>();
     }
 
-    private void Update() => Move();
-
-    private void Move()
+    private void OnEnable()
     {
-        transform.Translate(Vector2.down * moveSpeed * Time.deltaTime);
+        meteorHealth.OnDeath += HandleDeath;
     }
 
+    private void OnDisable()
+    {
+        meteorHealth.OnDeath -= HandleDeath;
+    }
+
+    // WaveManager gọi lúc spawn để chọn quỹ đạo: chéo (Shower thường) hay
+    // thẳng đứng tốc độ cao (High-Speed), không cần 2 script riêng.
+    public void ConfigureMovement(Vector2 newDirection, float newSpeed)
+    {
+        moveDirection = newDirection.sqrMagnitude > 0.0001f ? newDirection.normalized : Vector2.down;
+        moveSpeed = newSpeed;
+    }
+
+    private void Update()
+    {
+        transform.Translate(moveDirection * moveSpeed * Time.deltaTime);
+    }
+
+    // Không còn phân biệt màu nữa — bullet nào trúng cũng gây damage bình
+    // thường. Meteor giờ đơn thuần "bắn để phá hoặc để né".
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!collision.TryGetComponent(out Bullet bullet)) return;
         if (!bullet.IsPlayerBullet) return;
 
-        bool sameColor = bullet.ColorType == meteorPolarity.CurrentColor;
-
-        if (sameColor)
-        {
-            meteorHealth.TakeDamage(bullet.Damage * correctColorDamageMultiplier);
-            bullet.DestroyObject();
-            Debug.Log("Correct color hit! Meteor takes bonus damage.");
-        }
-        else
-        {
-            HandleWrongColorHit(bullet);
-        }
+        meteorHealth.TakeDamage(bullet.Damage);
+        bullet.DestroyObject();
     }
 
-    private void HandleWrongColorHit(Bullet bullet)
+    private void HandleDeath()
     {
-        if (meteorSize == MeteorSize.SMALL)
-        {
-            BounceBullet(bullet);
-        }
-        else
-        {
-            bullet.DestroyObject();
-            Explode();
-        }
-    }
+        if (meteorSize != MeteorSize.LARGE) return;
 
-    private void BounceBullet(Bullet bullet)
-    {
-        bullet.transform.Rotate(0f, 0f, 180f);
-        bullet.transform.position += bullet.transform.up * bounceNudgeDistance;
-        Debug.Log("Meteor bounced wrong-color bullet.");
-    }
-
-    private void Explode()
-    {
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
 
         foreach (Collider2D hit in hits)
@@ -83,11 +67,8 @@ public class MeteorController : MonoBehaviour, IDestroyable
                 Debug.Log("Meteor exploded! Player took " + explosionDamage + " AOE damage.");
             }
         }
-
-        meteorHealth.Kill();
     }
 
-    // Fix: rơi ra khỏi DestroyZoneBottom cũng phải qua MeteorHealth.Kill() để OnDeath fire.
     public void DestroyObject()
     {
         meteorHealth.Kill();
