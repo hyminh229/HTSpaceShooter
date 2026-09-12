@@ -6,7 +6,9 @@ public enum MovementPattern
     Hover,
     OrbitPoint,
     RandomFlutter,
-    SideToSideDescent
+    SideToSideDescent,
+    DiagonalDrift,
+    Stationary
 }
 
 public class EnemyController : MonoBehaviour, IDestroyable
@@ -43,9 +45,13 @@ public class EnemyController : MonoBehaviour, IDestroyable
     private bool hoverReady;
     private Vector2 descentBasePos;
 
+    private float minX = float.NegativeInfinity;
+    private float maxX = float.PositiveInfinity;
+    private int driftDirection = 1;
+
     private void Start()
     {
-        HasStopped = false;
+        HasStopped = pattern == MovementPattern.Stationary;
         orbitAngle = Random.Range(0f, 360f);
         flutterTarget = transform.position;
         hoverStartPos = transform.position;
@@ -61,13 +67,29 @@ public class EnemyController : MonoBehaviour, IDestroyable
             case MovementPattern.OrbitPoint: MoveOrbit(); break;
             case MovementPattern.RandomFlutter: MoveRandomFlutter(); break;
             case MovementPattern.SideToSideDescent: MoveSideToSideDescent(); break;
+            case MovementPattern.DiagonalDrift: MoveDiagonalDrift(); break;
+            case MovementPattern.Stationary: break;
         }
+
+        ClampHorizontalBounds();
     }
 
-    public void ConfigureMovement(MovementPattern newPattern, float newSpeed)
+    public void ConfigureMovement(MovementPattern newPattern, float newSpeed, float boundsMinX, float boundsMaxX, int newDriftDirection = 1)
     {
         pattern = newPattern;
         moveSpeed = newSpeed;
+        minX = boundsMinX;
+        maxX = boundsMaxX;
+        driftDirection = newDriftDirection;
+
+        HasStopped = pattern == MovementPattern.Stationary;
+    }
+
+    private void ClampHorizontalBounds()
+    {
+        Vector3 pos = transform.position;
+        pos.x = Mathf.Clamp(pos.x, minX, maxX);
+        transform.position = pos;
     }
 
     private void MoveLinearDown()
@@ -136,8 +158,14 @@ public class EnemyController : MonoBehaviour, IDestroyable
         transform.position = new Vector2(descentBasePos.x + offsetX, descentBasePos.y);
     }
 
-    // Fix: mọi đường huỷ (DestroyZone, ramming) đều đi qua EnemyHealth.Kill()
-    // để OnDeath luôn fire, WaveManager đếm đúng aliveCount.
+    private void MoveDiagonalDrift()
+    {
+        Vector2 velocity = new Vector2(driftDirection, -1f).normalized * moveSpeed;
+        transform.Translate(velocity * Time.deltaTime);
+    }
+
+    // FIX: đi qua EnemyHealth.Kill() thay vì Destroy() thẳng, để OnDeath luôn
+    // fire dù enemy biến mất kiểu gì (DestroyZone, ramming, hay chết do damage).
     public void DestroyObject()
     {
         if (TryGetComponent(out EnemyHealth enemyHealth))

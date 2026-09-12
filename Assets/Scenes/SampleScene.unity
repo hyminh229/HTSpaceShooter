@@ -646,9 +646,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94fa97fb93cbc7a48a0e49ea418cc31b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  topBoundary: {fileID: 101339119}
-  edgeMargin: 1.5
-  spawnYMargin: 1.5
+  horizontalMargin: 1
+  topSpawnMargin: 1.5
 --- !u!4 &685090842
 Transform:
   m_ObjectHideFlags: 0
@@ -1129,6 +1128,58 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a4581f1f4bb95b4fb1f929efd4ff6d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DestroyZone
+--- !u!1 &1077136038
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1077136040}
+  - component: {fileID: 1077136039}
+  m_Layer: 0
+  m_Name: GridWaveSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1077136039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1077136038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e4d959d8620c1d4999e35b3916f8812, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GridWaveSpawner
+  enemyPrefab: {fileID: 727100261008302460, guid: 12470980cb568144c96bdc2bbe7ed770, type: 3}
+  rows: 5
+  columns: 8
+  horizontalMargin: 1
+  topMargin: 1.2
+  rowSpacing: 1
+  rowRevealDelay: 0.35
+  shooterChance: 0.25
+--- !u!4 &1077136040
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1077136038}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1281438384
 GameObject:
   m_ObjectHideFlags: 0
@@ -1256,92 +1307,6 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1714093099}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1744770783
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1744770785}
-  - component: {fileID: 1744770784}
-  m_Layer: 0
-  m_Name: WaveManger
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1744770784
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1744770783}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 288e2fbea278d5544af2030b02f862da, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WaveManager
-  enemySpawner: {fileID: 685090841}
-  waves:
-  - waveName: Wave1
-    formation: 0
-    enemyPrefab: {fileID: 727100261008302460, guid: 12470980cb568144c96bdc2bbe7ed770, type: 3}
-    useRandomColor: 1
-    color: 0
-    movementPattern: 0
-    moveSpeed: 4
-    shooterChance: 0.25
-    rows: 5
-    columns: 5
-    gridSpacingX: 3
-    gridSpacingY: 1
-    showerCount: 0
-    showerSpawnInterval: 0
-    startCount: 0
-    maxCount: 0
-    growInterval: 0
-    useEntryEffect: 0
-    entryDropHeight: 1
-    entryStaggerDelay: 0.15
-  - waveName: Wave2
-    formation: 0
-    enemyPrefab: {fileID: 727100261008302460, guid: 12470980cb568144c96bdc2bbe7ed770, type: 3}
-    useRandomColor: 1
-    color: 0
-    movementPattern: 0
-    moveSpeed: 4
-    shooterChance: 0.25
-    rows: 5
-    columns: 5
-    gridSpacingX: 3
-    gridSpacingY: 1
-    showerCount: 0
-    showerSpawnInterval: 0
-    startCount: 0
-    maxCount: 0
-    growInterval: 0
-    useEntryEffect: 0
-    entryDropHeight: 1
-    entryStaggerDelay: 0.15
---- !u!4 &1744770785
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1744770783}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -1662,4 +1627,4 @@ SceneRoots:
   - {fileID: 811968756}
   - {fileID: 514652460}
   - {fileID: 685090842}
-  - {fileID: 1744770785}
+  - {fileID: 1077136040}

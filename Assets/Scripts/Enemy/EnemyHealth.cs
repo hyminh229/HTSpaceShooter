@@ -29,8 +29,8 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         }
     }
 
-    // Dùng khi enemy cần "chết" ngay lập tức mà không qua damage (VD: bay ra khỏi DestroyZone,
-    // bị player ramming) — vẫn phải fire OnDeath để WaveManager đếm đúng.
+    // Dùng khi enemy cần "chết" ngay lập tức mà không qua damage (VD: bay ra khỏi
+    // DestroyZone, bị Player ramming) — vẫn phải fire OnDeath để wave đếm đúng.
     public void Kill()
     {
         if (!IsAlive) return;
